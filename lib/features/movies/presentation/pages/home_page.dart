@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_finder/features/movies/domain/entities/movie.dart';
 import '../bloc/movie_bloc.dart';
 
 class HomePage extends StatelessWidget {

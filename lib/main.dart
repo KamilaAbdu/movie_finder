@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         routerConfig: _appRouter.config(),
         theme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: Colors.black,
