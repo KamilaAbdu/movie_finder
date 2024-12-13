@@ -11,7 +11,7 @@ class MovieRepositoryImpl implements MovieRepository {
 
   @override
   Future<List<Movie>> getMovies(String category) async {
-    final url = '${ApiConstants.baseUrl}/movie/$category?api_key=${ApiConstants.apiKey}';
+    final url = '${ApiConstants.baseUrl}/movie/$category?language=en-US&api_key=${ApiConstants.apiKey}';
     try {
       final response = await dio.get(url);
       if (response.statusCode == 200) {
