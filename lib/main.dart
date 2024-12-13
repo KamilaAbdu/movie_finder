@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:movie_finder/core/di/injector.dart';
+import 'package:movie_finder/features/movies/presentation/bloc/movie_bloc.dart';
+import 'core/router/app_router.dart';
 
 void main() {
-  runApp(const MainApp());
+  setupDependencies();
+  runApp(MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  MyApp({Key? key}) : super(key: key);
+
+  final AppRouter _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => GetIt.instance<MovieBloc>(),
+        ),
+      ],
+      child: MaterialApp.router(
+        routerConfig: _appRouter.config(),
+        theme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: Colors.black,
         ),
       ),
     );

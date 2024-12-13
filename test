@@ -1,0 +1,10 @@
+import 'dart:io';
+
+void checkConnection() async {
+  try {
+    final result = await InternetAddress.lookup('api.themoviedb.org');
+    print('Connected: $result');
+  } catch (e) {
+    print('Connection failed: $e');
+  }
+}

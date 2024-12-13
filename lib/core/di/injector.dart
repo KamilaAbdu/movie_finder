@@ -1,0 +1,27 @@
+import 'package:get_it/get_it.dart';
+import 'package:dio/dio.dart';
+import '../../features/movies/data/repositories/movie_repository_impl.dart';
+import '../../features/movies/domain/repositories/movie_repository.dart';
+import '../../features/movies/domain/usecases/get_movies_usecase.dart';
+import '../../features/movies/presentation/bloc/movie_bloc.dart';
+
+final getIt = GetIt.instance;
+
+void setupDependencies() {
+  // Регистрация Dio
+  getIt.registerLazySingleton<Dio>(() => Dio(BaseOptions(
+        baseUrl: 'https://api.themoviedb.org/3/',
+        connectTimeout: Duration(seconds: 5000),
+        receiveTimeout: Duration(seconds: 3000),
+      )));
+
+  // Регистрация MovieRepository
+  getIt.registerLazySingleton<MovieRepository>(
+      () => MovieRepositoryImpl(getIt<Dio>()));
+
+  // Регистрация UseCase
+  getIt.registerLazySingleton(() => GetMoviesUseCase(getIt<MovieRepository>()));
+
+  // Регистрация Bloc
+  getIt.registerFactory(() => MovieBloc(getIt<GetMoviesUseCase>()));
+}
