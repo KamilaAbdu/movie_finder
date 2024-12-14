@@ -11,17 +11,21 @@ void setupDependencies() {
   // Регистрация Dio
   getIt.registerLazySingleton<Dio>(() => Dio(BaseOptions(
         baseUrl: 'https://api.themoviedb.org/3/',
-        connectTimeout: Duration(seconds: 5000),
-        receiveTimeout: Duration(seconds: 3000),
+        connectTimeout: Duration(seconds: 3),
+        receiveTimeout: Duration(seconds: 2),
       )));
 
-  // Регистрация MovieRepository
+  Dio dio = Dio(BaseOptions(
+    baseUrl: 'https://api.themoviedb.org/3/',
+    connectTimeout: Duration(seconds: 3),
+    receiveTimeout: Duration(seconds: 2),
+  ))
+    ..interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+
   getIt.registerLazySingleton<MovieRepository>(
       () => MovieRepositoryImpl(getIt<Dio>()));
 
-  // Регистрация UseCase
   getIt.registerLazySingleton(() => GetMoviesUseCase(getIt<MovieRepository>()));
 
-  // Регистрация Bloc
   getIt.registerFactory(() => MovieBloc(getIt<GetMoviesUseCase>()));
 }

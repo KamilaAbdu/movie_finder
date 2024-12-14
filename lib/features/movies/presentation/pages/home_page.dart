@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_finder/core/constants/app_text_styles.dart';
 import '../bloc/movie_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:movie_finder/features/movies/domain/entities/movie.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -15,14 +18,29 @@ class HomePage extends StatelessWidget {
     movieBloc.fetchMovies('upcoming');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Movies')),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Movie Finder',
+          style: AppTextStyles.title.copyWith(color: Colors.red),
+        ),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildCategory(context, 'popular', 'Trending Movies'),
-            _buildCategory(context, 'top_rated', 'Top Rated Movies'),
-            _buildCategory(context, 'upcoming', 'Upcoming Movies'),
-          ],
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCategory(context, 'popular', 'Trending Movies'),
+              const SizedBox(height: 32),
+              _buildCategory(context, 'top_rated', 'Top Rated Movies'),
+              const SizedBox(height: 32),
+              _buildCategory(context, 'upcoming', 'Upcoming Movies'),
+            ],
+          ),
         ),
       ),
     );
@@ -38,14 +56,20 @@ class HomePage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              title,
+              style: GoogleFonts.aBeeZee(fontSize: 25),
             ),
+            const SizedBox(height: 16),
             if (isLoading)
               const Center(child: CircularProgressIndicator())
             else if (errorMessage != null)
-              Center(child: Text(errorMessage))
+              Center(
+                child: Text(
+                  errorMessage,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              )
             else if (movies != null)
               SizedBox(
                 height: 200,

@@ -1,6 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_finder/features/movies/domain/entities/movie.dart';
 import 'package:movie_finder/features/movies/domain/usecases/get_movies_usecase.dart';
+
+abstract class MovieState {}
+
+class MovieInitial extends MovieState {}
+
+class MovieLoading extends MovieState {}
 
 class MultiCategoryMovieState extends MovieState {
   final Map<String, List<Movie>> moviesByCategory;
@@ -34,18 +41,18 @@ class MultiCategoryMovieState extends MovieState {
   }
 }
 
-class MovieState {
-}
-
 class MovieBloc extends Cubit<MultiCategoryMovieState> {
   final GetMoviesUseCase getMoviesUseCase;
 
   MovieBloc(this.getMoviesUseCase) : super(MultiCategoryMovieState.initial());
 
   void fetchMovies(String category) async {
-    emit(state.copyWith(loadingCategories: {...state.loadingCategories, category}));
+    emit(state
+        .copyWith(loadingCategories: {...state.loadingCategories, category}));
+
     try {
       final movies = await getMoviesUseCase.execute(category: category);
+
       emit(
         state.copyWith(
           moviesByCategory: {
@@ -56,17 +63,26 @@ class MovieBloc extends Cubit<MultiCategoryMovieState> {
           errorMessages: {...state.errorMessages}..remove(category),
         ),
       );
+    } on DioException catch (dioError) {
+      emit(
+        state.copyWith(
+          loadingCategories: state.loadingCategories..remove(category),
+          errorMessages: {
+            ...state.errorMessages,
+            category: 'Failed to load movies: ${dioError.message}',
+          },
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(
           loadingCategories: state.loadingCategories..remove(category),
           errorMessages: {
             ...state.errorMessages,
-            category: e.toString(),
+            category: 'An unexpected error occurred: $e',
           },
         ),
       );
     }
   }
 }
-
