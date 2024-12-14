@@ -46,12 +46,22 @@ class MovieBloc extends Cubit<MultiCategoryMovieState> {
 
   MovieBloc(this.getMoviesUseCase) : super(MultiCategoryMovieState.initial());
 
-  void fetchMovies(String category) async {
-    emit(state
-        .copyWith(loadingCategories: {...state.loadingCategories, category}));
+  void fetchMovies(String category, {String? query}) async {
+    emit(
+      state.copyWith(
+        loadingCategories: {...state.loadingCategories, category},
+      ),
+    );
 
     try {
-      final movies = await getMoviesUseCase.execute(category: category);
+      List<Movie> movies;
+
+      // Выполняем поиск, если есть запрос, иначе загружаем фильмы по категории
+      if (query != null && query.isNotEmpty) {
+        movies = await getMoviesUseCase.execute(query: query);
+      } else {
+        movies = await getMoviesUseCase.execute(category: category);
+      }
 
       emit(
         state.copyWith(

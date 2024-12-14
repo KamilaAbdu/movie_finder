@@ -1,10 +1,13 @@
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_finder/core/constants/app_text_styles.dart';
+import 'package:movie_finder/features/movies/presentation/pages/widgets/search_bar.dart';
 import '../bloc/movie_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movie_finder/features/movies/domain/entities/movie.dart';
 
+@RoutePage()
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -12,7 +15,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final movieBloc = BlocProvider.of<MovieBloc>(context);
 
-    // Fetch movies for multiple categories
+    // Инициализация категорий фильмов
     movieBloc.fetchMovies('popular');
     movieBloc.fetchMovies('top_rated');
     movieBloc.fetchMovies('upcoming');
@@ -25,23 +28,39 @@ class HomePage extends StatelessWidget {
           'Movie Finder',
           style: AppTextStyles.title.copyWith(color: Colors.red),
         ),
-        centerTitle: true,
+        actions: [SearchWidget(
+          onSearch: (query) {
+            if (query.isNotEmpty) {
+              movieBloc.fetchMovies('search', query: query); // Добавлен запрос поиска
+            } else {
+              movieBloc.fetchMovies('popular'); // Сброс на популярные фильмы
+            }
+          },
+        ),]
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCategory(context, 'popular', 'Trending Movies'),
-              const SizedBox(height: 32),
-              _buildCategory(context, 'top_rated', 'Top Rated Movies'),
-              const SizedBox(height: 32),
-              _buildCategory(context, 'upcoming', 'Upcoming Movies'),
-            ],
-          ),
-        ),
+      body: BlocBuilder<MovieBloc, MultiCategoryMovieState>(
+        builder: (context, state) {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state.moviesByCategory['search'] != null &&
+                      state.moviesByCategory['search']!.isNotEmpty)
+                    _buildCategory(context, 'search', 'Search Results'),
+                  const SizedBox(height: 32),
+                  _buildCategory(context, 'popular', 'Trending Movies'),
+                  const SizedBox(height: 32),
+                  _buildCategory(context, 'top_rated', 'Top Rated Movies'),
+                  const SizedBox(height: 32),
+                  _buildCategory(context, 'upcoming', 'Upcoming Movies'),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

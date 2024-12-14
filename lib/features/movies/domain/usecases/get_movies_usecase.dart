@@ -6,7 +6,12 @@ class GetMoviesUseCase {
 
   GetMoviesUseCase(this.repository);
 
-  Future<List<Movie>> execute({String category = 'popular'}) {
-    return repository.getMovies(category);
+  Future<List<Movie>> execute({String category = 'popular', String query = ''}) {
+    if (query.isNotEmpty) {
+      return repository.searchMovies(query);
+    } else {
+      return repository.getMovies(category);
+    }
   }
 }
+

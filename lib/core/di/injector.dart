@@ -22,10 +22,13 @@ void setupDependencies() {
   ))
     ..interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
 
+  // Регистрация MovieRepository
   getIt.registerLazySingleton<MovieRepository>(
       () => MovieRepositoryImpl(getIt<Dio>()));
 
+  // Регистрация UseCase
   getIt.registerLazySingleton(() => GetMoviesUseCase(getIt<MovieRepository>()));
 
+  // Регистрация Bloc
   getIt.registerFactory(() => MovieBloc(getIt<GetMoviesUseCase>()));
 }

@@ -4,6 +4,7 @@ import 'package:movie_finder/features/movies/data/models/movie_model.dart';
 import 'package:movie_finder/features/movies/domain/entities/movie.dart';
 import 'package:movie_finder/features/movies/domain/repositories/movie_repository.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 
 class MovieRepositoryImpl implements MovieRepository {
   final Dio dio;
@@ -15,6 +16,17 @@ class MovieRepositoryImpl implements MovieRepository {
     final url =
         '${ApiConstants.baseUrl}/movie/$category?language=en-US&api_key=${ApiConstants.apiKey}';
 
+    return await _fetchMovies(url);
+  }
+
+  Future<List<Movie>> searchMovies(String query) async {
+    final url =
+        '${ApiConstants.baseUrl}/search/movie?query=$query&language=en-US&api_key=${ApiConstants.apiKey}';
+
+    return await _fetchMovies(url);
+  }
+
+  Future<List<Movie>> _fetchMovies(String url) async {
     // Проверка соединения
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
@@ -31,7 +43,7 @@ class MovieRepositoryImpl implements MovieRepository {
       }
     } on DioException catch (e) {
       // Логирование ошибок
-      print('DioError: ${e.response?.data}');
+      debugPrint('DioError: ${e.response?.data}');
       throw Exception('Failed to fetch movies: ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
